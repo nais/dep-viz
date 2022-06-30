@@ -1,8 +1,11 @@
 (ns dep-vis.service
   (:require [io.pedestal.http :as http]
             [io.pedestal.http.route :as route]
+            [dep-vis.greeter :as greeter]
+            [dep-vis.neo4j :as neo4j]
             [io.pedestal.http.body-params :as body-params]
-            [ring.util.response :as ring-resp]))
+            [ring.util.response :as ring-resp])
+  (:import (java.nio.file Path)))
 
 (defn about-page
   [request]
@@ -14,55 +17,37 @@
   [request]
   (ring-resp/response "Hello World!"))
 
+
+(defn populate-DB [request]
+  [request]
+  (let [path (Path/of "tmp" "neo4j")]
+            (neo4j/create-neo4j-database path))
+  (ring-resp/response "Hello database!"))
+
+
+(defn respond-hello [request]
+  (let [nm (get-in request [:query-params :name])
+        resp (greeter/greeting-for nm)]
+    {:status 200 :body resp}))
+
 ;; Defines "/" and "/about" routes with their associated :get handlers.
 ;; The interceptors defined after the verb map (e.g., {:get home-page}
 ;; apply to / and its children (/about).
 (def common-interceptors [(body-params/body-params) http/html-body])
 
-;; Tabular routes
-(def routes #{["/" :get (conj common-interceptors `home-page)]
-              ["/about" :get (conj common-interceptors `about-page)]})
+(def routes (route/expand-routes
+              #{["/" :get (conj common-interceptors `home-page)]
+                ["/about" :get (conj common-interceptors `about-page)]
+                ["/greet" :get respond-hello :route-name :greet]
+                ["/populateDB" :get populate-DB :route-name :populateDB]
+                })
+  )
 
 
-;; Consumed by dep-vis.server/create-server
-;; See http/default-interceptors for additional options you can configure
-(def service {:env :prod
-              ;; You can bring your own non-default interceptors. Make
-              ;; sure you include routing and set it up right for
-              ;; dev-mode. If you do, many other keys for configuring
-              ;; default interceptors will be ignored.
-              ;; ::http/interceptors []
+
+(def service {:env          :prod
               ::http/routes routes
+              ::http/type   :jetty
+              ::http/port   8080
+              })
 
-              ;; Uncomment next line to enable CORS support, add
-              ;; string(s) specifying scheme, host and port for
-              ;; allowed source(s):
-              ;;
-              ;; "http://localhost:8080"
-              ;;
-              ;;::http/allowed-origins ["scheme://host:port"]
-
-              ;; Tune the Secure Headers
-              ;; and specifically the Content Security Policy appropriate to your service/application
-              ;; For more information, see: https://content-security-policy.com/
-              ;;   See also: https://github.com/pedestal/pedestal/issues/499
-              ;;::http/secure-headers {:content-security-policy-settings {:object-src "'none'"
-              ;;                                                          :script-src "'unsafe-inline' 'unsafe-eval' 'strict-dynamic' https: http:"
-              ;;                                                          :frame-ancestors "'none'"}}
-
-              ;; Root for resource interceptor that is available by default.
-              ::http/resource-path "/public"
-
-              ::http/type :jetty
-              ::http/port 8080
-              ;; Options to pass to the container (Jetty)
-              ::http/container-options {:h2c? true
-                                        :h2? false
-                                        ;:keystore "test/hp/keystore.jks"
-                                        ;:key-password "password"
-                                        ;:ssl-port 8443
-                                        :ssl? false
-                                        ;; Alternatively, You can specify you're own Jetty HTTPConfiguration
-                                        ;; via the `:io.pedestal.http.jetty/http-configuration` container option.
-                                        ;:io.pedestal.http.jetty/http-configuration (org.eclipse.jetty.server.HttpConfiguration.)
-                                        }})
