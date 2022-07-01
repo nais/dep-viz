@@ -1,11 +1,11 @@
 (ns dep-vis.service
-  (:require [io.pedestal.http :as http]
-            [io.pedestal.http.route :as route]
-            [dep-vis.greeter :as greeter]
+  (:require [dep-vis.greeter :as greeter]
             [dep-vis.neo4j :as neo4j]
+            [io.pedestal.http :as http]
             [io.pedestal.http.body-params :as body-params]
-            [ring.util.response :as ring-resp])
-  (:import (java.io File)))
+            [io.pedestal.http.route :as route]
+            [neo4j-clj.core :as db]
+            [ring.util.response :as ring-resp]))
 
 (defn about-page
   [request]
@@ -17,12 +17,18 @@
   [request]
   (ring-resp/response "Hello World!"))
 
+(def instance
+  (neo4j/create-neo4j-database))
+
+;(db/defquery create-user
+ ;            "CREATE (u:user $user)")
 
 (defn populate-DB [request]
   [request]
-  (let [file (new File "/tmp/neo4j")]
-    (neo4j/create-neo4j-database file))
-  (ring-resp/response "Hello database!"))
+;  (with-open [session (db/get-session instance)]
+;    (create-user session {:user {:first-name "Luke" :last-name "Skywalker"}}))
+(ring-resp/response "Hello database!") )
+
 
 
 (defn respond-hello [request]

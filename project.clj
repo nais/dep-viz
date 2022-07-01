@@ -9,6 +9,7 @@
                  [org.neo4j/neo4j "4.4.8" :exclusions [org.slf4j/slf4j-nop]]
                  [org.neo4j/neo4j-bolt "4.4.8" :exclusions [org.slf4j/slf4j-nop]]
                  [ch.qos.logback/logback-classic "1.2.11" :exclusions [org.slf4j/slf4j-api]]
+                 [gorillalabs/neo4j-clj "4.1.2"]
                  ]
   :min-lein-version "2.0.0"
   :resource-paths ["config", "resources"]
