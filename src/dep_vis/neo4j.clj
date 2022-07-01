@@ -4,7 +4,7 @@
 (defn create-neo4j-database [database-directory]
   (let [management-service-builder (new DatabaseManagementServiceBuilder database-directory)]
     (let [service (. management-service-builder build)]
-      (let [graph-db (. service database "dep-vis")]
+      (let [graph-db (. service database "neo4j")]
         graph-db))))
 
 

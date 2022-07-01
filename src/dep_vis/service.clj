@@ -5,7 +5,7 @@
             [dep-vis.neo4j :as neo4j]
             [io.pedestal.http.body-params :as body-params]
             [ring.util.response :as ring-resp])
-  (:import (java.nio.file Path)))
+  (:import (java.io File)))
 
 (defn about-page
   [request]
@@ -20,8 +20,8 @@
 
 (defn populate-DB [request]
   [request]
-  (let [path (Path/of "tmp" "neo4j")]
-            (neo4j/create-neo4j-database path))
+  (let [file (new File "/tmp/neo4j")]
+    (neo4j/create-neo4j-database file))
   (ring-resp/response "Hello database!"))
 
 
