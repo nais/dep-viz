@@ -7,6 +7,7 @@
                  [io.pedestal/pedestal.service "0.5.10"]
                  [io.pedestal/pedestal.jetty "0.5.10"]
                  [org.neo4j/neo4j "4.4.8" :exclusions [org.slf4j/slf4j-nop]]
+                 [org.neo4j/neo4j-bolt "4.4.8" :exclusions [org.slf4j/slf4j-nop]]
                  [ch.qos.logback/logback-classic "1.2.11" :exclusions [org.slf4j/slf4j-api]]
                  ]
   :min-lein-version "2.0.0"
