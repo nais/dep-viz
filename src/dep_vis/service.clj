@@ -41,7 +41,7 @@
 ;; apply to / and its children (/about).
 (def common-interceptors [(body-params/body-params) http/html-body])
 
-(def routes (route/expand-routes
+(def routes (
               #{["/" :get (conj common-interceptors `home-page)]
                 ["/about" :get (conj common-interceptors `about-page)]
                 ["/greet" :get respond-hello :route-name :greet]

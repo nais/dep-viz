@@ -5,7 +5,7 @@
            (org.neo4j.configuration GraphDatabaseSettings)
            (java.io File)))
 
-(def create-neo4j-database
+(defn create-neo4j-database []
   (let [file (new File "/tmp/neo4j")]
     (let [management-service-builder (new DatabaseManagementServiceBuilder file)]
       (. management-service-builder setConfig BoltConnector/enabled true)
